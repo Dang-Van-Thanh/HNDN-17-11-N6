@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_phieu_muon_form" model="ir.ui.view">
+            <field name="name">phieu_muon_form</field>
+            <field name="model">phieu_muon</field>
+            <field name="arch" type="xml">
+                <form string="Phiếu Mượn Tài Sản" class="o_form_sheet">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="ma_phieu_muon" />
+                                <field name="state" widget="statusbar" statusbar_visible="draft,approved,done,cancelled"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Thông Tin Mượn">
+                                <group>
+                                    <field name="nhan_vien_id" placeholder="Chọn nhân viên..." required="1"/>
+                                    <field name="tai_san_id" placeholder="Chọn tài sản..." required="1"/>
+                                    <field name="ngay_muon_du_kien" widget="datetime" required="1"/>
+                                    <field name="ngay_tra_du_kien" widget="datetime" required="1"/>
+                                </group>
+                            </page>
+                            <page string="Trạng Thái và Ghi Chú">
+                                <group>
+                                    <field name="trang_thai_muon"/>
+                                    <field name="ghi_chu" widget="text" placeholder="Nhập ghi chú..."/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <footer>
+                            <button name="action_approve" string="Duyệt" type="object" states="draft" class="px-2 btn-primary"/>
+                            <button name="action_done" string="Hoàn Thành" type="object" states="approved" class="px-2 btn-success"/>
+                            <button name="action_cancel" string="Hủy" type="object" states="draft,approved" class="px-2 btn-danger"/>
+                            <button name="action_reset_to_draft" string="Quay lại Nháp" type="object" states="cancelled" class="px-2 btn-warning"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_phieu_muon_kanban" model="ir.ui.view">
+            <field name="name">phieu_muon_kanban</field>
+            <field name="model">phieu_muon</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="ma_phieu_muon"/>
+                    <field name="nhan_vien_id"/>
+                    <field name="tai_san_id"/>
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card">
+                                <strong t-esc="record.ma_phieu_muon.value" class="d-block"/>
+                                <span t-esc="record.nhan_vien_id.value"/>
+                                <span t-esc="record.tai_san_id.value" class="text-muted"/>
+                                <span class="badge badge-info" t-esc="record.state.value"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="phieu_muon_search" model="ir.ui.view">
+            <field name="name">phieu_muon_search</field>
+            <field name="model">phieu_muon</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="ma_phieu_muon"/>
+                    <field name="nhan_vien_id"/>
+                    <field name="tai_san_id"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_phieu_muon" model="ir.actions.act_window">
+            <field name="name">Phiếu Mượn</field>
+            <field name="res_model">phieu_muon</field>
+            <field name="view_mode">kanban,form</field>
+        </record>
+    </data>
+</odoo>

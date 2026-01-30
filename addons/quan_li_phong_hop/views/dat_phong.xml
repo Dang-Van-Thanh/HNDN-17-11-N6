@@ -1,0 +1,137 @@
+<odoo>
+    <data>
+        <!-- Form View - Đăng ký mượn phòng -->
+        <record id="view_dat_phong_form" model="ir.ui.view">
+            <field name="name">dat_phong_form</field>
+            <field name="model">dat_phong</field>
+            <field name="arch" type="xml">
+                <form string="📋 Chi tiết Đăng Ký Mượn Phòng">
+                    <sheet>
+                       
+                        <group col="2">
+                            <group>
+                                <separator string="🏷 Thông tin chung" colspan="2"/>
+                                <field name="phong_id"/>
+                                <field name="nguoi_muon_id"/>
+                                
+                            </group>
+                        </group>
+
+                        <group col="2">
+                            <separator string="📅 Thời gian Mượn Trả" colspan="2"/>
+                            <field name="thoi_gian_muon_du_kien" string="⏳ Mượn dự kiến"/>
+                         
+                            <field name="thoi_gian_tra_du_kien" string="📆 Trả dự kiến"/>
+                       
+                        </group>
+                        <notebook>
+                            <!-- Thêm tab hiển thị chi tiết sử dụng -->
+                            <page string="📊 Chi Tiết Sử Dụng">
+                                <field name="chi_tiet_su_dung_ids">
+                                    <tree>
+                                        <field name="nguoi_muon_id" string="👤 Người mượn"/>
+                                        <field name="thoi_gian_muon_thuc_te" string="⏰ Mượn thực tế"/>
+                                        <field name="thoi_gian_tra_thuc_te" string="⏱ Trả thực tế"/>
+                                        <field name="trang_thai" string="📌 Trạng thái"
+                                               decoration-muted="trang_thai=='đã_trả'"
+                                               decoration-danger="trang_thai=='đang_sử_dụng'"
+                                               decoration-success="trang_thai=='đã_duyệt'"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View - Danh sách Đăng ký mượn phòng -->
+        <record id="view_dat_phong_tree" model="ir.ui.view">
+            <field name="name">dat_phong_tree</field>
+            <field name="model">dat_phong</field>
+            <field name="arch" type="xml">
+                <tree string="📋 Danh sách Đăng Ký Mượn Phòng">
+                    <field name="phong_id" string="🏢 Phòng họp"/>
+                    <field name="nguoi_muon_id" string="👤 Người mượn"/>
+                    <field name="thoi_gian_muon_du_kien" string="⏳ Mượn dự kiến"/>
+                    <field name="thoi_gian_tra_du_kien" string="📆 Trả dự kiến"/>
+                    <field name="trang_thai" string="📌 Trạng thái"
+                           decoration-muted="trang_thai=='đã_hủy'"
+                           decoration-danger="trang_thai=='đang_sử_dụng'"
+                           decoration-info="trang_thai=='đã_duyệt'"
+                           decoration-success="trang_thai=='chờ_duyệt'"/>
+
+                    <!-- Nút hành động -->
+                    <button name="xac_nhan_duyet_phong" string="✅ Duyệt" type="object" class="btn-primary"
+                        attrs="{'invisible': [('trang_thai', '!=', 'chờ_duyệt')]}"/>
+                    <button name="huy_muon_phong" string="❌ Hủy" type="object" class="btn-danger"
+                        attrs="{'invisible': [('trang_thai', '!=', 'chờ_duyệt')]}"/>
+                    <button name="bat_dau_su_dung" string="🚀 Bắt đầu" type="object" class="btn-success"
+                        attrs="{'invisible': [('trang_thai', '!=', 'đã_duyệt')]}"/>
+                    <button name="huy_da_duyet" string="🛑 Hủy" type="object" class="btn-warning"
+                        attrs="{'invisible': [('trang_thai', '!=', 'đã_duyệt')]}"/>
+                    <button name="tra_phong" string="🏠 Trả phòng" type="object" class="btn-info"
+                        attrs="{'invisible': [('trang_thai', '!=', 'đang_sử_dụng')]}"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View - Bộ lọc tìm kiếm -->
+        <record model="ir.ui.view" id="dat_phong_search">
+            <field name="model">dat_phong</field>
+            <field name="arch" type="xml">
+                <search string="🔍 Tìm kiếm Đăng Ký Mượn Phòng">
+                    <field name="phong_id" string="🏢 Phòng họp"/>
+                    <field name="nguoi_muon_id" string="👤 Người mượn"/>
+                    <field name="thoi_gian_muon_du_kien" string="⏳ Mượn dự kiến"/>
+                    <field name="thoi_gian_tra_du_kien" string="📆 Trả dự kiến"/>
+                    <field name="trang_thai" string="📌 Trạng thái"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action - Danh sách tất cả đăng ký -->
+        <record id="action_dat_phong" model="ir.actions.act_window">
+            <field name="name">📋 Danh sách Đăng Ký Mượn Phòng</field>
+            <field name="res_model">dat_phong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="dat_phong_search"/>
+        </record>
+
+        <!-- Action - Danh sách Chờ duyệt -->
+        <record id="action_dat_phong_cho_duyet" model="ir.actions.act_window">
+            <field name="name">📋 Danh sách Chờ Duyệt</field>
+            <field name="res_model">dat_phong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="dat_phong_search"/>
+            <field name="domain">[("trang_thai", "=", "chờ_duyệt")]</field>
+        </record>
+
+        <!-- Action - Danh sách Đã duyệt -->
+        <record id="action_dat_phong_da_duyet" model="ir.actions.act_window">
+            <field name="name">📋 Danh sách Đã Duyệt</field>
+            <field name="res_model">dat_phong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="dat_phong_search"/>
+            <field name="domain">[("trang_thai", "=", "đã_duyệt")]</field>
+        </record>
+
+        <!-- Action - Danh sách Đang sử dụng -->
+        <record id="action_dat_phong_dang_su_dung" model="ir.actions.act_window">
+            <field name="name">📋 Danh sách Phòng Đang Sử Dụng</field>
+            <field name="res_model">dat_phong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="dat_phong_search"/>
+            <field name="domain">[("trang_thai", "=", "đang_sử_dụng")]</field>
+        </record>
+
+        <!-- Action - Danh sách Đã hủy -->
+        <record id="action_dat_phong_da_huy" model="ir.actions.act_window">
+            <field name="name">📋 Danh sách Đã Hủy</field>
+            <field name="res_model">dat_phong</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="dat_phong_search"/>
+            <field name="domain">[("trang_thai", "=", "đã_hủy")]</field>
+        </record>
+    </data>
+</odoo>
