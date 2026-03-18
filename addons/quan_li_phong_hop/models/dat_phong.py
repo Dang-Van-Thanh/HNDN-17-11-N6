@@ -51,7 +51,15 @@ class DatPhong(models.Model):
             xu_li_cung_phong_trung_thoi_gian = self.search(cung_phong_trung_thoi_gian)
             for other in xu_li_cung_phong_trung_thoi_gian:
                 other.write({"trang_thai": "đã_hủy"})
-                self.env["dat_phong"].lich_su(other)
+                self.env["lich_su_thay_doi"].create({
+                    "dat_phong_id": other.id,
+                    "nguoi_muon_id": other.nguoi_muon_id.id,
+                    "thoi_gian_muon_du_kien": other.thoi_gian_muon_du_kien,
+                    "thoi_gian_muon_thuc_te": other.thoi_gian_muon_thuc_te,
+                    "thoi_gian_tra_du_kien": other.thoi_gian_tra_du_kien,
+                    "thoi_gian_tra_thuc_te": other.thoi_gian_tra_thuc_te,
+                    "trang_thai": other.trang_thai
+                })
 
             # Hủy các yêu cầu khác phòng nhưng của cùng một người mượn nếu bị trùng thời gian
             khac_phong_trung_thoi_gian = [
@@ -64,7 +72,15 @@ class DatPhong(models.Model):
             xu_li_khac_phong_trung_thoi_gian = self.search(khac_phong_trung_thoi_gian)
             for other in xu_li_khac_phong_trung_thoi_gian:
                 other.write({"trang_thai": "đã_hủy"})
-                self.env["dat_phong"].lich_su(other)
+                self.env["lich_su_thay_doi"].create({
+                    "dat_phong_id": other.id,
+                    "nguoi_muon_id": other.nguoi_muon_id.id,
+                    "thoi_gian_muon_du_kien": other.thoi_gian_muon_du_kien,
+                    "thoi_gian_muon_thuc_te": other.thoi_gian_muon_thuc_te,
+                    "thoi_gian_tra_du_kien": other.thoi_gian_tra_du_kien,
+                    "thoi_gian_tra_thuc_te": other.thoi_gian_tra_thuc_te,
+                    "trang_thai": other.trang_thai
+                })
 
     def huy_muon_phong(self):
         """ Hủy đăng ký mượn phòng """
@@ -72,7 +88,15 @@ class DatPhong(models.Model):
             if record.trang_thai != "chờ_duyệt":
                 raise exceptions.UserError("Chỉ có thể hủy yêu cầu có trạng thái 'Chờ duyệt'.")
             record.write({"trang_thai": "đã_hủy"})
-            self.env["dat_phong"].lich_su(record)
+            self.env["lich_su_thay_doi"].create({
+                "dat_phong_id": record.id,
+                "nguoi_muon_id": record.nguoi_muon_id.id,
+                "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
+                "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
+                "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
+                "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
+                "trang_thai": record.trang_thai
+            })
 
     def huy_da_duyet(self):
         """ Hủy yêu cầu đã duyệt """
