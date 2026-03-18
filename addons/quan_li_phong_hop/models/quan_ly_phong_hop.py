@@ -49,6 +49,15 @@ class QuanLyPhongHop(models.Model):
                 record.trang_thai = "Trống"
             else:
                 record.trang_thai = "Trống"
+            
+            # Đồng bộ trạng thái với tài sản
+            if record.tai_san_id:
+                if record.trang_thai == "Đang_sử_dụng":
+                    record.tai_san_id.trang_thai = "Muon"
+                elif record.trang_thai == "Đã_mượn":
+                    record.tai_san_id.trang_thai = "Muon"
+                else:
+                    record.tai_san_id.trang_thai = "CatGiu"
 
     @api.model
     def create(self, vals):
