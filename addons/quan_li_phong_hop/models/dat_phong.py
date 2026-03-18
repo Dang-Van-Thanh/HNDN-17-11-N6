@@ -30,7 +30,15 @@ class DatPhong(models.Model):
             
             # Duyệt yêu cầu hiện tại
             record.write({"trang_thai": "đã_duyệt"})
-            self.env["dat_phong"].lich_su(record)
+            self.env["lich_su_thay_doi"].create({
+                "dat_phong_id": record.id,
+                "nguoi_muon_id": record.nguoi_muon_id.id,
+                "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
+                "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
+                "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
+                "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
+                "trang_thai": record.trang_thai
+            })
 
             # Hủy các yêu cầu cùng phòng có thời gian trùng lặp
             cung_phong_trung_thoi_gian = [
@@ -96,7 +104,15 @@ class DatPhong(models.Model):
                 "trang_thai": "đang_sử_dụng",
                 "thoi_gian_muon_thuc_te": datetime.now()
             })
-            self.env["dat_phong"].lich_su(record)
+            self.env["lich_su_thay_doi"].create({
+                "dat_phong_id": record.id,
+                "nguoi_muon_id": record.nguoi_muon_id.id,
+                "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
+                "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
+                "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
+                "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
+                "trang_thai": record.trang_thai
+            })
 
 
     def tra_phong(self):
