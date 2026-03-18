@@ -35,6 +35,12 @@ class PhieuMuon(models.Model):
                 if phong_hop:
                     raise ValidationError(f"Không thể mượn phòng họp '{phong_hop.name}' thông qua phiếu mượn tài sản. Vui lòng sử dụng module quản lý phòng họp để đặt phòng.")
 
+    @api.constrains('ngay_muon_du_kien', 'ngay_tra_du_kien')
+    def _check_ngay_muon_tra(self):
+        for record in self:
+            if record.ngay_muon_du_kien and record.ngay_tra_du_kien and record.ngay_muon_du_kien >= record.ngay_tra_du_kien:
+                raise ValidationError('Ngày trả phải lớn hơn ngày mượn dự kiến.')
+
     @api.model
     def create(self, vals):
         if vals.get('ma_phieu_muon', 'New') == 'New' or not vals.get('ma_phieu_muon'):
@@ -72,6 +78,17 @@ class PhieuMuon(models.Model):
     def action_approve(self):
         for record in self:
             if record.state == 'draft':
+                # Kiểm tra trùng thời gian với các phiếu đã duyệt hoặc đang mượn
+                existing = self.search([
+                    ('id', '!=', record.id),
+                    ('tai_san_id', '=', record.tai_san_id.id),
+                    ('state', 'in', ['approved', 'done']),
+                    ('ngay_muon_du_kien', '<', record.ngay_tra_du_kien),
+                    ('ngay_tra_du_kien', '>', record.ngay_muon_du_kien),
+                ])
+                if existing:
+                    raise ValidationError('Tài sản đã được đặt/mượn trong khoảng thời gian này.')
+
                 self.env['lich_su_su_dung'].create({
                     'ma_lich_su_su_dung': self.env['ir.sequence'].next_by_code('lich_su_su_dung') or 'New',
                     'ngay_muon': record.ngay_muon_du_kien,
@@ -142,5 +159,5 @@ class PhieuMuon(models.Model):
                 record.state = 'draft'
                 record.tai_san_id.write({
                     'trang_thai': 'CatGiu',
-                    'nguoi_dang_dung_id': False
+                    'nguoi_su_dung_id': False
                 })
