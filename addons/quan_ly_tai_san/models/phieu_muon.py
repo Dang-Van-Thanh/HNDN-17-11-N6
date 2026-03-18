@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError, UserError
 
@@ -7,7 +8,11 @@ class PhieuMuon(models.Model):
     _description = 'Phiếu mượn tài sản'
     _order = 'ma_phieu_muon'
 
-    ma_phieu_muon = fields.Char("Mã phiếu mượn", required=True)
+    ma_phieu_muon = fields.Char("Mã phiếu mượn", required=True, default="New")
+
+    _sql_constraints = [
+        ('ma_phieu_muon_unique', 'unique(ma_phieu_muon)', 'Mã phiếu mượn phải là duy nhất!'),
+    ]
     ngay_muon_du_kien = fields.Datetime("Thời gian mượn dự kiến", required=True)
     ngay_muon_thuc_te = fields.Datetime("Thời gian mượn thực tế", required=False)
     ngay_tra_du_kien = fields.Datetime("Thời gian trả dự kiến", required=True)
@@ -106,8 +111,12 @@ class PhieuMuon(models.Model):
     def action_done(self):
         for record in self:
             if record.state == 'approved':
-                if not record.ngay_muon_thuc_te or not record.ngay_tra_thuc_te:
-                    raise UserError('Vui lòng nhập Ngày mượn thực tế và Ngày trả thực tế trước khi hoàn thành.')
+                # Nếu chưa nhập thời gian thực tế thì tự động gán
+                if not record.ngay_muon_thuc_te:
+                    record.ngay_muon_thuc_te = datetime.now()
+                if not record.ngay_tra_thuc_te:
+                    record.ngay_tra_thuc_te = datetime.now()
+
                 record.state = 'done'
                 lich_su = self.env['lich_su_su_dung'].search([
                     ('nhan_vien_id', '=', record.nhan_vien_id.id),
