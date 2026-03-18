@@ -26,6 +26,15 @@ class PhieuMuon(models.Model):
         default='draft', string="Trạng thái")
     trang_thai_muon = fields.Char('Trạng thái mượn', compute='_compute_trang_thai_muon', store=True)
 
+    @api.constrains('tai_san_id')
+    def _check_khong_muon_phong_hop(self):
+        for record in self:
+            if record.tai_san_id:
+                # Kiểm tra xem tài sản này có liên kết với phòng họp không
+                phong_hop = self.env['quan_ly_phong_hop'].search([('tai_san_id', '=', record.tai_san_id.id)], limit=1)
+                if phong_hop:
+                    raise ValidationError(f"Không thể mượn phòng họp '{phong_hop.name}' thông qua phiếu mượn tài sản. Vui lòng sử dụng module quản lý phòng họp để đặt phòng.")
+
 
 
     @api.depends('ngay_muon_du_kien', 'ngay_muon_thuc_te', 'ngay_tra_du_kien', 'ngay_tra_thuc_te')
