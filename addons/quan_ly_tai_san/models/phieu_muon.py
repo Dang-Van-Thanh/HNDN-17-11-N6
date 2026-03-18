@@ -35,6 +35,12 @@ class PhieuMuon(models.Model):
                 if phong_hop:
                     raise ValidationError(f"Không thể mượn phòng họp '{phong_hop.name}' thông qua phiếu mượn tài sản. Vui lòng sử dụng module quản lý phòng họp để đặt phòng.")
 
+    @api.model
+    def create(self, vals):
+        if vals.get('ma_phieu_muon', 'New') == 'New' or not vals.get('ma_phieu_muon'):
+            vals['ma_phieu_muon'] = self.env['ir.sequence'].next_by_code('phieu_muon') or 'New'
+        return super(PhieuMuon, self).create(vals)
+
 
 
     @api.depends('ngay_muon_du_kien', 'ngay_muon_thuc_te', 'ngay_tra_du_kien', 'ngay_tra_thuc_te')
