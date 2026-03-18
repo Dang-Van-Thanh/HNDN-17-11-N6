@@ -11,6 +11,8 @@ class QuanLyPhongHop(models.Model):
     ], string="Loại phòng", required=True, default="Phòng_họp")
     suc_chua = fields.Integer(string="Sức chứa")
 
+    tai_san_id = fields.Many2one('tai_san', string="Tài sản tương ứng", readonly=True)
+
     trang_thai = fields.Selection([
         ("Trống", "Trống"),
         ("Đã_mượn", "Đã mượn"),
@@ -47,3 +49,24 @@ class QuanLyPhongHop(models.Model):
                 record.trang_thai = "Trống"
             else:
                 record.trang_thai = "Trống"
+
+    @api.model
+    def create(self, vals):
+        # Tạo tài sản tương ứng
+        loai_phong = vals.get('loai_phong', 'Phòng_họp')
+        ten_loai = "Phòng họp" if loai_phong == "Phòng_họp" else "Hội trường"
+        loai_ts = self.env['loai_tai_san'].search([('ten_loai_tai_san', '=', ten_loai)], limit=1)
+        if not loai_ts:
+            loai_ts = self.env['loai_tai_san'].create({
+                'ma_loai_tai_san': ten_loai.replace(' ', '_'),
+                'ten_loai_tai_san': ten_loai,
+            })
+        tai_san_vals = {
+            'ma_tai_san': vals.get('name', 'New'),
+            'so_serial': vals.get('name', 'New'),
+            'ten_tai_san': vals['name'],
+            'loai_tai_san_id': loai_ts.id,
+        }
+        tai_san = self.env['tai_san'].create(tai_san_vals)
+        vals['tai_san_id'] = tai_san.id
+        return super(QuanLyPhongHop, self).create(vals)
