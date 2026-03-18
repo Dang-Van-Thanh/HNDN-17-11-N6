@@ -32,6 +32,7 @@
                         <footer>
                             <button name="action_approve" string="Duyệt" type="object" states="draft" class="px-2 btn-primary"/>
                             <button name="action_done" string="Hoàn Thành" type="object" states="approved" class="px-2 btn-success"/>
+                            <button name="action_return" string="Trả Tài Sản" type="object" states="done" class="px-2 btn-info"/>
                             <button name="action_cancel" string="Hủy" type="object" states="draft,approved" class="px-2 btn-danger"/>
                             <button name="action_reset_to_draft" string="Quay lại Nháp" type="object" states="cancelled" class="px-2 btn-warning"/>
                         </footer>

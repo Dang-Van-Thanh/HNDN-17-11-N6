@@ -126,6 +126,16 @@ class PhieuMuon(models.Model):
                     'nguoi_dang_dung_id': False
                 })
 
+    def action_return(self):
+        """Trả tài sản - chuyển từ trạng thái 'done' về 'cancelled'"""
+        for record in self:
+            if record.state == 'done':
+                record.state = 'cancelled'
+                record.tai_san_id.write({
+                    'trang_thai': 'CatGiu',
+                    'nguoi_dang_dung_id': False
+                })
+
     def action_reset_to_draft(self):
         for record in self:
             if record.state == 'cancelled':
