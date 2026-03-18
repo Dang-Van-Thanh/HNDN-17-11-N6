@@ -83,7 +83,7 @@ class PhieuMuon(models.Model):
                 record.state = 'approved'
                 record.tai_san_id.write({
                     'trang_thai': 'Muon',
-                    'nguoi_dang_dung_id': record.nhan_vien_id.id
+                    'nguoi_su_dung_id': record.nhan_vien_id.id
                 })
 
     def action_done(self):
@@ -105,7 +105,7 @@ class PhieuMuon(models.Model):
                     })
                 record.tai_san_id.write({
                     'trang_thai': 'CatGiu',
-                    'nguoi_dang_dung_id': False
+                    'nguoi_su_dung_id': False
                 })
 
     def action_cancel(self):
@@ -123,7 +123,7 @@ class PhieuMuon(models.Model):
                 record.state = 'cancelled'
                 record.tai_san_id.write({
                     'trang_thai': 'CatGiu',
-                    'nguoi_dang_dung_id': False
+                    'nguoi_su_dung_id': False
                 })
 
     def action_return(self):
@@ -133,7 +133,7 @@ class PhieuMuon(models.Model):
                 record.state = 'cancelled'
                 record.tai_san_id.write({
                     'trang_thai': 'CatGiu',
-                    'nguoi_dang_dung_id': False
+                    'nguoi_su_dung_id': False
                 })
 
     def action_reset_to_draft(self):
