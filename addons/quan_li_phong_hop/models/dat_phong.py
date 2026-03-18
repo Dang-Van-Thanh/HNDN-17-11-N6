@@ -124,15 +124,16 @@ class DatPhong(models.Model):
 
             self.lich_su(record)
 
-    @api.model
-    def lich_su(self, record):
-        """ Ghi vào lịch sử mượn trả """
-        self.env["lich_su_thay_doi"].create({
-            "dat_phong_id": record.id,
-            "nguoi_muon_id": record.nguoi_muon_id.id,
-            "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
-            "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
-            "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
-            "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
-            "trang_thai": record.trang_thai
-        })
+    @api.constrains('phong_id', 'thoi_gian_muon_du_kien', 'thoi_gian_tra_du_kien')
+    def _check_trung_gio_phong(self):
+        for record in self:
+            if record.phong_id and record.thoi_gian_muon_du_kien and record.thoi_gian_tra_du_kien:
+                trung_lap = self.search([
+                    ('phong_id', '=', record.phong_id.id),
+                    ('id', '!=', record.id),
+                    ('trang_thai', '=', 'chờ_duyệt'),
+                    ('thoi_gian_muon_du_kien', '<', record.thoi_gian_tra_du_kien),
+                    ('thoi_gian_tra_du_kien', '>', record.thoi_gian_muon_du_kien)
+                ])
+                if trung_lap:
+                    raise exceptions.ValidationError(f"Phòng {record.phong_id.name} đã có yêu cầu đặt vào thời gian này. Vui lòng chọn thời gian khác.")
