@@ -1,10 +1,10 @@
 <odoo>
     <data>
         <menuitem id="menu_root"
-                  name="Quản lí phòng họp, hội trường"
+                  name="QLPH"
                   sequence="0"/>
 
-        <menuitem name="Danh sách phòng họp, hội trường" 
+        <menuitem name="Danh sách phòng họp" 
                   id="menu_quan_ly_phong_hop" 
                   parent="menu_root" 
                   sequence="1"

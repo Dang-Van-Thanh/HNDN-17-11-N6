@@ -3,7 +3,7 @@
     <data>
         <menuitem
                 id="menu_root"
-                name="Quản lý tài sản (QLTS)"
+                name="QLTS"
                 sequence="0"
         />
 
