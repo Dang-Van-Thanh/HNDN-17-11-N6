@@ -110,6 +110,18 @@ class DatPhong(models.Model):
                 "thoi_gian_tra_thuc_te": current_time,
                 "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te or current_time
             })
+
+            # Lưu vào lịch sử sử dụng tài sản
+            tai_san = record.phong_id.tai_san_id
+            if tai_san:
+                self.env["lich_su_su_dung"].create({
+                    "ngay_muon": record.thoi_gian_muon_thuc_te,
+                    "ngay_tra": record.thoi_gian_tra_thuc_te,
+                    "nhan_vien_id": record.nguoi_muon_id.id,
+                    "tai_san_id": tai_san.id,
+                    "ghi_chu": f"Mượn phòng {record.phong_id.name}"
+                })
+
             self.lich_su(record)
 
     @api.model
