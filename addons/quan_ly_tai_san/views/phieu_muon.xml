@@ -20,6 +20,8 @@
                                     <field name="tai_san_id" placeholder="Chọn tài sản..." required="1"/>
                                     <field name="ngay_muon_du_kien" widget="datetime" required="1"/>
                                     <field name="ngay_tra_du_kien" widget="datetime" required="1"/>
+                                    <field name="ngay_muon_thuc_te" widget="datetime"/>
+                                    <field name="ngay_tra_thuc_te" widget="datetime"/>
                                 </group>
                             </page>
                             <page string="Trạng Thái và Ghi Chú">
@@ -64,6 +66,23 @@
             </field>
         </record>
 
+        <record id="view_phieu_muon_tree" model="ir.ui.view">
+            <field name="name">phieu_muon_tree</field>
+            <field name="model">phieu_muon</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="ma_phieu_muon"/>
+                    <field name="nhan_vien_id"/>
+                    <field name="tai_san_id"/>
+                    <field name="state"/>
+                    <button name="action_approve" type="object" string="Duyệt" attrs="{'invisible':[('state','!=','draft')]}"/>
+                    <button name="action_done" type="object" string="Hoàn Thành" attrs="{'invisible':[('state','!=','approved')]}"/>
+                    <button name="action_return" type="object" string="Trả" attrs="{'invisible':[('state','!=','done')]}"/>
+                    <button name="action_cancel" type="object" string="Hủy" attrs="{'invisible':[('state','not in',('draft','approved'))]}"/>
+                </tree>
+            </field>
+        </record>
+
         <record id="phieu_muon_search" model="ir.ui.view">
             <field name="name">phieu_muon_search</field>
             <field name="model">phieu_muon</field>
@@ -80,7 +99,7 @@
         <record id="action_phieu_muon" model="ir.actions.act_window">
             <field name="name">Phiếu Mượn</field>
             <field name="res_model">phieu_muon</field>
-            <field name="view_mode">kanban,form</field>
+            <field name="view_mode">kanban,tree,form</field>
         </record>
     </data>
 </odoo>
