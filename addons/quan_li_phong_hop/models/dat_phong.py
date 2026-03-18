@@ -81,7 +81,15 @@ class DatPhong(models.Model):
                 raise exceptions.UserError("Chỉ có thể hủy yêu cầu có trạng thái 'Đã duyệt'.")
             
             record.write({"trang_thai": "đã_hủy"})
-            self.env["dat_phong"].lich_su(record)
+            self.env["lich_su_thay_doi"].create({
+                "dat_phong_id": record.id,
+                "nguoi_muon_id": record.nguoi_muon_id.id,
+                "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
+                "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
+                "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
+                "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
+                "trang_thai": record.trang_thai
+            })
 
     def bat_dau_su_dung(self):
         """ Bắt đầu sử dụng phòng - Cập nhật thời gian mượn thực tế """
@@ -138,7 +146,15 @@ class DatPhong(models.Model):
                     "ghi_chu": f"Mượn phòng {record.phong_id.name}"
                 })
 
-            self.env["dat_phong"].lich_su(record)
+            self.env["lich_su_thay_doi"].create({
+                "dat_phong_id": record.id,
+                "nguoi_muon_id": record.nguoi_muon_id.id,
+                "thoi_gian_muon_du_kien": record.thoi_gian_muon_du_kien,
+                "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te,
+                "thoi_gian_tra_du_kien": record.thoi_gian_tra_du_kien,
+                "thoi_gian_tra_thuc_te": record.thoi_gian_tra_thuc_te,
+                "trang_thai": record.trang_thai
+            })
 
     @api.constrains('phong_id', 'thoi_gian_muon_du_kien', 'thoi_gian_tra_du_kien')
     def _check_trung_gio_phong(self):
