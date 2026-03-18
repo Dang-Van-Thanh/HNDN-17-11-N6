@@ -43,15 +43,6 @@
                                     </tree>
                                 </field>
                             </page>
-                            <page string="🖥️ Thiết bị trong phòng">
-                                <field name="thiet_bi_ids">
-                                    <tree>
-                                        <field name="name" string="📌 Tên thiết bị"/>
-                                        <field name="loai_thiet_bi" string="📦 Loại thiết bị"/>
-                                        <field name="trang_thai" string="🔄 Trạng thái"/>
-                                    </tree>
-                                </field>
-                            </page>
                         </notebook>
                     </sheet>
                 </form>
