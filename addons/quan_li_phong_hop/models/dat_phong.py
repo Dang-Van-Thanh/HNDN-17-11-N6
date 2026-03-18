@@ -30,7 +30,7 @@ class DatPhong(models.Model):
             
             # Duyệt yêu cầu hiện tại
             record.write({"trang_thai": "đã_duyệt"})
-            self.lich_su(record)
+            self.env["dat_phong"].lich_su(record)
 
             # Hủy các yêu cầu cùng phòng có thời gian trùng lặp
             cung_phong_trung_thoi_gian = [
@@ -43,7 +43,7 @@ class DatPhong(models.Model):
             xu_li_cung_phong_trung_thoi_gian = self.search(cung_phong_trung_thoi_gian)
             for other in xu_li_cung_phong_trung_thoi_gian:
                 other.write({"trang_thai": "đã_hủy"})
-                self.lich_su(other)
+                self.env["dat_phong"].lich_su(other)
 
             # Hủy các yêu cầu khác phòng nhưng của cùng một người mượn nếu bị trùng thời gian
             khac_phong_trung_thoi_gian = [
@@ -56,7 +56,7 @@ class DatPhong(models.Model):
             xu_li_khac_phong_trung_thoi_gian = self.search(khac_phong_trung_thoi_gian)
             for other in xu_li_khac_phong_trung_thoi_gian:
                 other.write({"trang_thai": "đã_hủy"})
-                self.lich_su(other)
+                self.env["dat_phong"].lich_su(other)
 
     def huy_muon_phong(self):
         """ Hủy đăng ký mượn phòng """
@@ -64,7 +64,7 @@ class DatPhong(models.Model):
             if record.trang_thai != "chờ_duyệt":
                 raise exceptions.UserError("Chỉ có thể hủy yêu cầu có trạng thái 'Chờ duyệt'.")
             record.write({"trang_thai": "đã_hủy"})
-            self.lich_su(record)
+            self.env["dat_phong"].lich_su(record)
 
     def huy_da_duyet(self):
         """ Hủy yêu cầu đã duyệt """
@@ -73,7 +73,7 @@ class DatPhong(models.Model):
                 raise exceptions.UserError("Chỉ có thể hủy yêu cầu có trạng thái 'Đã duyệt'.")
             
             record.write({"trang_thai": "đã_hủy"})
-            self.lich_su(record)
+            self.env["dat_phong"].lich_su(record)
 
     def bat_dau_su_dung(self):
         """ Bắt đầu sử dụng phòng - Cập nhật thời gian mượn thực tế """
@@ -96,7 +96,7 @@ class DatPhong(models.Model):
                 "trang_thai": "đang_sử_dụng",
                 "thoi_gian_muon_thuc_te": datetime.now()
             })
-            self.lich_su(record)
+            self.env["dat_phong"].lich_su(record)
 
 
     def tra_phong(self):
@@ -122,7 +122,7 @@ class DatPhong(models.Model):
                     "ghi_chu": f"Mượn phòng {record.phong_id.name}"
                 })
 
-            self.lich_su(record)
+            self.env["dat_phong"].lich_su(record)
 
     @api.constrains('phong_id', 'thoi_gian_muon_du_kien', 'thoi_gian_tra_du_kien')
     def _check_trung_gio_phong(self):
