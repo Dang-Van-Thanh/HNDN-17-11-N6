@@ -15,6 +15,7 @@
 
     'data': [
         'security/ir.model.access.csv',
+        'data/sequence_data.xml',
         'views/tai_san.xml',
         'views/phieu_muon.xml',
         'views/phieu_bao_tri.xml',

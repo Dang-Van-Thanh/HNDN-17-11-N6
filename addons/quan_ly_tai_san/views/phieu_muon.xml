@@ -59,6 +59,12 @@
                                 <span t-esc="record.nhan_vien_id.value"/>
                                 <span t-esc="record.tai_san_id.value" class="text-muted"/>
                                 <span class="badge badge-info" t-esc="record.state.value"/>
+                                <div class="o_kanban_footer">
+                                    <button type="object" name="action_approve" class="btn btn-sm btn-primary" t-if="record.state.value == 'draft'">Duyệt</button>
+                                    <button type="object" name="action_done" class="btn btn-sm btn-success" t-if="record.state.value == 'approved'">Hoàn Thành</button>
+                                    <button type="object" name="action_return" class="btn btn-sm btn-info" t-if="record.state.value == 'done'">Trả</button>
+                                    <button type="object" name="action_cancel" class="btn btn-sm btn-danger" t-if="record.state.value in ['draft','approved']">Hủy</button>
+                                </div>
                             </div>
                         </t>
                     </templates>
