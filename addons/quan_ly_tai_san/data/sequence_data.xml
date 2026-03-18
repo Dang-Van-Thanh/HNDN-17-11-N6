@@ -8,5 +8,12 @@
             <field name="padding">4</field>
             <field name="number_next">1</field>
         </record>
+        <record id="seq_lich_su_su_dung" model="ir.sequence">
+            <field name="name">Lịch sử sử dụng</field>
+            <field name="code">lich_su_su_dung</field>
+            <field name="prefix">LSSD-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+        </record>
     </data>
 </odoo>
