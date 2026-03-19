@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_tai_san_form_inherit_phong_hop" model="ir.ui.view">
-            <field name="name">tai_san.form.inherit.phong_hop</field>
-            <field name="model">tai_san</field>
-            <field name="inherit_id" ref="quan_ly_tai_san.view_tai_san_form_new"/>
-            <field name="arch" type="xml">
-                <xpath expr="//notebook" position="inside">
-                    <page string="🏢 Phòng Họp Sử Dụng">
-                        <field name="phong_hop_ids" widget="many2many">
-                            <tree>
-                                <field name="name" string="Tên phòng"/>
-                                <field name="loai_phong" string="Loại phòng"/>
-                                <field name="suc_chua" string="Sức chứa"/>
-                                <field name="trang_thai" string="Trạng thái"/>
-                            </tree>
-                        </field>
-                    </page>
-                </xpath>
-            </field>
-        </record>
+        <!-- Removed inherit view for tai_san as field phong_hop_id is not present -->
     </data>
 </odoo>
