@@ -46,7 +46,7 @@
 
                             <!-- Tài sản trong phòng -->
                             <page string="🖥️ Tài Sản Trong Phòng">
-                                <field name="tai_san_ids" widget="many2many_tags">
+                                <field name="tai_san_ids" widget="many2many">
                                     <tree>
                                         <field name="ten_tai_san" string="Tên tài sản"/>
                                         <field name="ma_tai_san" string="Mã tài sản"/>

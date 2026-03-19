@@ -86,7 +86,7 @@
                                 </field>
                             </page>
                             <page string="🏢 Phòng Họp Sử Dụng">
-                                <field name="phong_hop_ids" widget="many2many_tags">
+                                <field name="phong_hop_ids" widget="many2many">
                                     <tree>
                                         <field name="name" string="Tên phòng"/>
                                         <field name="loai_phong" string="Loại phòng"/>
