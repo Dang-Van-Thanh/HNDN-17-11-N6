@@ -12,10 +12,11 @@ class LichSuSuDung(models.Model):
 
     ma_lich_su_su_dung = fields.Char("Mã lịch sử sử dụng", required=True, copy=False, readonly=True, default="New")
     ngay_muon = fields.Datetime("Thời gian mượn", required=True)
-    ngay_tra = fields.Datetime("Thời gian trả", required=True)
+    ngay_tra = fields.Datetime("Thời gian trả")
     ghi_chu = fields.Char("Ghi chú")
     nhan_vien_id = fields.Many2one(comodel_name="nhan_vien", string="Nhân sự", store=True)
     tai_san_id = fields.Many2one(comodel_name="tai_san", string="Tài sản", store=True)
+    dat_phong_id = fields.Many2one(comodel_name="dat_phong", string="Phiếu đặt phòng", store=True)
 
     @api.model
     def create(self, vals):
