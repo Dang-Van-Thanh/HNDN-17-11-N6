@@ -44,16 +44,17 @@ class QuanLyPhongHop(models.Model):
         store=True,
     )
 
-    @api.onchange('tai_san_ids')
-    def _onchange_tai_san_ids(self):
-        for tai_san in self.tai_san_ids:
-            if tai_san.loai_tai_san_id.ten_loai_tai_san == "Phòng họp":
-                raise exceptions.ValidationError("Không thể gán tài sản loại 'Phòng họp' cho phòng họp.")
-            # Kiểm tra nếu tài sản đã thuộc phòng khác
-            other_phong = self.env['quan_ly_phong_hop'].search([('id', '!=', self.id), ('tai_san_ids', 'in', tai_san.id)])
-            if other_phong:
-                phong_names = ', '.join(other_phong.mapped('name'))
-                raise exceptions.ValidationError(f"Tài sản '{tai_san.ten_tai_san}' đã được gán cho phòng khác: {phong_names}")
+    @api.constrains('tai_san_ids')
+    def _check_tai_san_ids(self):
+        for record in self:
+            for tai_san in record.tai_san_ids:
+                if tai_san.loai_tai_san_id.ten_loai_tai_san == "Phòng họp":
+                    raise exceptions.ValidationError("Không thể gán tài sản loại 'Phòng họp' cho phòng họp.")
+                # Kiểm tra nếu tài sản đã thuộc phòng khác
+                other_phong = self.search([('id', '!=', record.id), ('tai_san_ids', 'in', tai_san.id)])
+                if other_phong:
+                    phong_names = ', '.join(other_phong.mapped('name'))
+                    raise exceptions.ValidationError(f"Tài sản '{tai_san.ten_tai_san}' đã được gán cho phòng khác: {phong_names}")
 
     @api.depends("dat_phong_ids.trang_thai")
     def _compute_trang_thai(self):
