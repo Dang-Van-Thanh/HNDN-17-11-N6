@@ -68,6 +68,15 @@ class QuanLyPhongHop(models.Model):
                 else:
                     record.tai_san_id.trang_thai = "CatGiu"
 
+            # Đồng bộ trạng thái với tất cả tài sản trong phòng
+            if record.tai_san_ids:
+                if record.trang_thai == "Đang_sử_dụng":
+                    record.tai_san_ids.write({"trang_thai": "Muon"})
+                elif record.trang_thai == "Đã_mượn":
+                    record.tai_san_ids.write({"trang_thai": "Muon"})
+                else:
+                    record.tai_san_ids.write({"trang_thai": "CatGiu"})
+
     @api.model
     def create(self, vals):
         # Tạo tài sản tương ứng

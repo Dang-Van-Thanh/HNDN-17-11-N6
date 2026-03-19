@@ -136,6 +136,11 @@ class DatPhong(models.Model):
                 "trang_thai": "đang_sử_dụng",
                 "thoi_gian_muon_thuc_te": datetime.now()
             })
+
+            # Cập nhật trạng thái tài sản trong phòng: chuyển sang "Muon"
+            if record.phong_id.tai_san_ids:
+                record.phong_id.tai_san_ids.write({"trang_thai": "Muon"})
+
             self.env["lich_su_thay_doi"].create({
                 "dat_phong_id": record.id,
                 "nguoi_muon_id": record.nguoi_muon_id.id,
@@ -158,6 +163,10 @@ class DatPhong(models.Model):
                 "thoi_gian_tra_thuc_te": current_time,
                 "thoi_gian_muon_thuc_te": record.thoi_gian_muon_thuc_te or current_time
             })
+
+            # Cập nhật trạng thái tài sản trong phòng: chuyển về "CatGiu"
+            if record.phong_id.tai_san_ids:
+                record.phong_id.tai_san_ids.write({"trang_thai": "CatGiu"})
 
             # Lưu vào lịch sử sử dụng tài sản
             tai_san = record.phong_id.tai_san_id
