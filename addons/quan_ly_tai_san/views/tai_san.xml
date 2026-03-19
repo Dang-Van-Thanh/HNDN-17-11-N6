@@ -85,6 +85,16 @@
                                     </tree>
                                 </field>
                             </page>
+                            <page string="🏢 Phòng Họp Sử Dụng">
+                                <field name="phong_hop_ids" widget="many2many_tags">
+                                    <tree>
+                                        <field name="name" string="Tên phòng"/>
+                                        <field name="loai_phong" string="Loại phòng"/>
+                                        <field name="suc_chua" string="Sức chứa"/>
+                                        <field name="trang_thai" string="Trạng thái"/>
+                                    </tree>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>

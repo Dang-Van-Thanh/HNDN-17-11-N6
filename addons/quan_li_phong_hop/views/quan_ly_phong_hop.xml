@@ -43,6 +43,18 @@
                                     </tree>
                                 </field>
                             </page>
+
+                            <!-- Tài sản trong phòng -->
+                            <page string="🖥️ Tài Sản Trong Phòng">
+                                <field name="tai_san_ids" widget="many2many_tags">
+                                    <tree>
+                                        <field name="ten_tai_san" string="Tên tài sản"/>
+                                        <field name="ma_tai_san" string="Mã tài sản"/>
+                                        <field name="loai_tai_san_id" string="Loại"/>
+                                        <field name="trang_thai" string="Trạng thái"/>
+                                    </tree>
+                                </field>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>

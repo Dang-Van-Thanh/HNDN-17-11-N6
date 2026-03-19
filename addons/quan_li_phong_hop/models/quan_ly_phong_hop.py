@@ -34,6 +34,15 @@ class QuanLyPhongHop(models.Model):
         domain=[("trang_thai", "=", "đã_trả")]
     )
 
+    tai_san_ids = fields.Many2many(
+        comodel_name='tai_san',
+        relation='tai_san_phong_hop_rel',
+        column1='phong_hop_id',
+        column2='tai_san_id',
+        string="Tài sản trong phòng",
+        store=True,
+    )
+
     @api.depends("dat_phong_ids.trang_thai")
     def _compute_trang_thai(self):
         for record in self:
