@@ -88,3 +88,16 @@ class QuanLyPhongHop(models.Model):
         tai_san = self.env['tai_san'].create(tai_san_vals)
         vals['tai_san_id'] = tai_san.id
         return super(QuanLyPhongHop, self).create(vals)
+
+
+class TaiSan(models.Model):
+    _inherit = 'tai_san'
+
+    phong_hop_ids = fields.Many2many(
+        comodel_name='quan_ly_phong_hop',
+        relation='tai_san_phong_hop_rel',
+        column1='tai_san_id',
+        column2='phong_hop_id',
+        string="Phòng họp sử dụng",
+        store=True,
+    )

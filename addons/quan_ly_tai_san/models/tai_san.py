@@ -90,15 +90,6 @@ class TaiSan(models.Model):
         string="Phiếu thanh lý",
     )
 
-    phong_hop_ids = fields.Many2many(
-        comodel_name='quan_ly_phong_hop',
-        relation='tai_san_phong_hop_rel',
-        column1='tai_san_id',
-        column2='phong_hop_id',
-        string="Phòng họp sử dụng",
-        store=True,
-    )
-
     def action_dieu_chuyen_tai_san(self):
         for record in self:
             return {
