@@ -63,20 +63,20 @@ class NhanVien(models.Model):
             if laptop_assets:
                 laptop_assets.write({'trang_thai': 'CatGiu', 'nguoi_su_dung_id': False})
 
+            # Hủy tất cả phiếu mượn của nhân viên (không chỉ laptop)
             open_phieus = self.env['phieu_muon'].search(
                 [
                     ('nhan_vien_id', '=', record.id),
-                    ('tai_san_id', 'in', laptop_assets.ids),
                     ('state', 'in', ['draft', 'approved']),
                 ]
             )
             for phieu in open_phieus:
                 if phieu.state == 'approved':
-                    # action_done sẽ cập nhật tai_san và lịch sử
-                    phieu.action_done()
+                    # Gọi action_cancel để hủy phiếu mượn
+                    phieu.action_cancel()
                 else:
-                    # bỏ qua chuyển thành done nếu mới draft
-                    phieu.state = 'done'
+                    # Nếu draft thì chuyển trạng thái thành cancelled
+                    phieu.state = 'cancelled'
 
             # Thu hồi đặt phòng họp thuộc trạng thái chờ/đã duyệt/đang sử dụng khi nhân viên nghỉ việc
             booking_records = self.env['dat_phong'].search([
