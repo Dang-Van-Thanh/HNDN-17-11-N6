@@ -236,8 +236,8 @@ class DatPhong(models.Model):
         if not api_key.startswith('AIzaSy') or len(api_key) < 35:
             return 'API key không hợp lệ. API key phải bắt đầu bằng "AIzaSy" và có độ dài ít nhất 35 ký tự.'
 
-        # Sử dụng endpoint chính xác cho Gemini 1.5 Pro
-        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={api_key}'
+        # Sử dụng Gemini 2.5 Flash - model mới nhất có sẵn
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}'
         headers = {
             'Content-Type': 'application/json',
         }
