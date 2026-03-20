@@ -14,7 +14,13 @@ class DatPhongGeminiWizard(models.TransientModel):
         """Gọi AI Gemini để phân tích yêu cầu và gợi ý phòng"""
         if not self.yeu_cau_text:
             self.goi_y_ai = 'Vui lòng nhập yêu cầu đặt phòng.'
-            return
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': self._name,
+                'view_mode': 'form',
+                'res_id': self.id,
+                'target': 'new',
+            }
 
         # Prompt để AI phân tích và gợi ý
         prompt = f"""
@@ -46,6 +52,15 @@ class DatPhongGeminiWizard(models.TransientModel):
 
         except BaseException as e:
             self.goi_y_ai = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
+
+        # Reload wizard để hiển thị kết quả
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+        }
 
     def action_dat_phong_theo_goi_y(self):
         """Đặt phòng theo gợi ý AI"""
