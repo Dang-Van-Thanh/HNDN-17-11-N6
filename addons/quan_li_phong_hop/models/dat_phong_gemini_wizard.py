@@ -17,7 +17,7 @@ class DatPhongGeminiWizard(models.TransientModel):
             return
 
         try:
-            data = self.env['dat_phong'].suggest_room_for_time_capacity(
+            data = self.env['dat_phong'].sudo().suggest_room_for_time_capacity(
                 self.thoi_gian_muon_du_kien,
                 self.thoi_gian_tra_du_kien,
                 self.suc_chua,
