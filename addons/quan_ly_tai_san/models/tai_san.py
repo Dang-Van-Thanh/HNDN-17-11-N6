@@ -98,6 +98,12 @@ class TaiSan(models.Model):
         string="Phiếu thanh lý",
     )
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('ma_tai_san') or vals.get('ma_tai_san') == 'New':
+            vals['ma_tai_san'] = self.env['ir.sequence'].next_by_code('tai_san') or 'New'
+        return super(TaiSan, self).create(vals)
+
     def action_dieu_chuyen_tai_san(self):
         for record in self:
             return {

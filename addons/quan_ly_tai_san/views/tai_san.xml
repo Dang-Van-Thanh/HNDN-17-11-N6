@@ -16,7 +16,7 @@
                         <div class="row mt-3">
                             <div class="col-4">
                                 <group>
-                                    <field name="ma_tai_san" class="o_inline"/>
+                                    <field name="ma_tai_san" class="o_inline" readonly="1"/>
                                     <field name="so_serial" placeholder="Số serial"/>
                                 </group>
                             </div>

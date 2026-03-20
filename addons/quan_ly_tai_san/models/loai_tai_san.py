@@ -13,12 +13,18 @@ class LoaiTaiSan(models.Model):
         ('ma_loai_tai_san_unique', 'unique(ma_loai_tai_san)', 'Mã loại tài sản phải là duy nhất!')
     ]
 
-    ma_loai_tai_san = fields.Char("Mã Loại Tài sản", required=True)
+    ma_loai_tai_san = fields.Char("Mã Loại Tài sản", required=True, copy=False, default="New")
     ten_loai_tai_san = fields.Char("Tên Loại Tài sản", required=True)
     mo_ta = fields.Text("Mô tả")
     tai_san_ids = fields.One2many(
         comodel_name='tai_san',
         inverse_name='loai_tai_san_id', string="Tài sản", required=True)
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('ma_loai_tai_san') or vals.get('ma_loai_tai_san') == 'New':
+            vals['ma_loai_tai_san'] = self.env['ir.sequence'].next_by_code('loai_tai_san') or 'New'
+        return super(LoaiTaiSan, self).create(vals)
 
     tong_so_luong = fields.Integer("Tổng số lượng", compute='_compute_thong_ke_trang_thai')
     luu_tru_count = fields.Integer("Số lượng Lưu trữ", compute='_compute_thong_ke_trang_thai')

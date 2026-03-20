@@ -9,7 +9,7 @@
                     <sheet>
                         <group>
                             <field name="ten_loai_tai_san" placeholder="Nhập tên loại tài sản..." required="1"/>
-                            <field name="ma_loai_tai_san" placeholder="Nhập mã loại tài sản..."/>
+                            <field name="ma_loai_tai_san" placeholder="Mã loại tài sản tự sinh" readonly="1"/>
                             <field name="mo_ta" placeholder="Mô tả chi tiết loại tài sản..." widget="textarea"/>
                         </group>
 

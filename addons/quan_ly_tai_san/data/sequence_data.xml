@@ -15,5 +15,21 @@
             <field name="padding">4</field>
             <field name="number_next">1</field>
         </record>
+
+        <record id="seq_loai_tai_san" model="ir.sequence">
+            <field name="name">Loại tài sản</field>
+            <field name="code">loai_tai_san</field>
+            <field name="prefix">LTS-</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+        </record>
+
+        <record id="seq_tai_san" model="ir.sequence">
+            <field name="name">Tài sản</field>
+            <field name="code">tai_san</field>
+            <field name="prefix">TS-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+        </record>
     </data>
 </odoo>
