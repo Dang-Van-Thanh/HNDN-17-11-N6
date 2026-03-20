@@ -13,6 +13,7 @@
                             <field name="ten"/>
                             <field name="ho_va_ten"/>
                             <field name="ma_dinh_danh"/>
+                            <field name="trang_thai"/>
                             <field name="ngay_sinh"/>
                             <field name="tuoi"/>
                             <field name="so_nguoi_bang_tuoi"/>
@@ -43,6 +44,7 @@
                     <field name="ho_ten_dem"/>
                     <field name="ten"/>
                     <field name="ho_va_ten"/>
+                    <field name="trang_thai"/>
                     <field name="ngay_sinh"/>
                     <field name="tuoi"/>
                     <field name="so_nguoi_bang_tuoi"/>
@@ -58,10 +60,13 @@
                 <search>
                     <field name="ma_dinh_danh"/>
                     <field name="ho_va_ten"/>
+                    <field name="trang_thai"/>
                     <field name="ngay_sinh"/>
                     <field name="tuoi"/>
                     <field name="que_quan"/>
                     <field name="email"/>
+                    <filter name="nhan_vien_dang_lam" string="Đang làm" domain="[('trang_thai', '=', 'DangLam')]"/>
+                    <filter name="nhan_vien_nghi_viec" string="Nghỉ việc" domain="[('trang_thai', '=', 'NghiViec')]"/>
                 </search>
             </field>
         </record>
