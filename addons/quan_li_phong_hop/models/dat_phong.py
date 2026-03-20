@@ -1,5 +1,6 @@
 from odoo import models, fields, api, exceptions
 from datetime import datetime
+import requests
 
 class DatPhong(models.Model):
     _name = "dat_phong"
@@ -204,6 +205,93 @@ class DatPhong(models.Model):
                 "trang_thai": record.trang_thai
             })
 
+    @api.model
+    def _get_available_rooms(self, thoi_gian_bd, thoi_gian_kt, suc_chua):
+        """Trả về phòng họp trống để gợi ý theo yêu cầu"""
+        if not (thoi_gian_bd and thoi_gian_kt and suc_chua):
+            return self.env['quan_ly_phong_hop'].sudo().search([])
+
+        # Loại bỏ phòng đang bị đặt trong khung thời gian tương ứng
+        query = [
+            ('trang_thai', 'in', ['chờ_duyệt', 'đã_duyệt', 'đang_sử_dụng']),
+            ('thoi_gian_muon_du_kien', '<', thoi_gian_kt),
+            ('thoi_gian_tra_du_kien', '>', thoi_gian_bd),
+        ]
+        booked_rooms = self.search(query).mapped('phong_id').ids
+
+        candidates = self.env['quan_ly_phong_hop'].sudo().search([
+            ('suc_chua', '>=', suc_chua),
+            ('id', 'not in', booked_rooms)
+        ])
+        return candidates
+
+    @api.model
+    def _call_gemini_api(self, prompt):
+        params = self.env['ir.config_parameter'].sudo()
+        api_key = params.get_param('quan_li_phong_hop.gemini_api_key')
+        if not api_key:
+            return 'Chưa cấu hình API Gemini. Sử dụng gợi ý nội bộ.'
+
+        url = 'https://gemini.googleapis.com/v1/models/gemini-1.5-mini:generateText'
+        headers = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json',
+        }
+        payload = {
+            'prompt': prompt,
+            'temperature': 0.2,
+            'maxOutputTokens': 400,
+        }
+
+        try:
+            result = requests.post(url, json=payload, headers=headers, timeout=20)
+            result.raise_for_status()
+            data = result.json()
+            if data.get('candidates'):
+                return data['candidates'][0].get('content', '').strip()
+            return data.get('output', {}).get('text', '').strip() or 'Gemini trả về kết quả rỗng.'
+        except Exception as e:
+            return f'Không thể kết nối Gemini: {str(e)}'
+
+    @api.model
+    def suggest_room_for_time_capacity(self, thoi_gian_bd, thoi_gian_kt, suc_chua):
+        rooms = self._get_available_rooms(thoi_gian_bd, thoi_gian_kt, suc_chua)
+        if not rooms:
+            return {
+                'choices': rooms,
+                'ai_report': 'Không có phòng phù hợp trong khoảng thời gian và sức chứa này.'
+            }
+
+        top3 = rooms.sorted(key=lambda r: r.suc_chua)[:3]
+        room_list = '\n'.join([f"- {r.name} (sức chứa {r.suc_chua})" for r in top3])
+
+        prompt = (
+            f"Bạn là trợ lý đặt phòng họp. Dựa vào yêu cầu:\n"
+            f"* Thời gian từ {thoi_gian_bd} đến {thoi_gian_kt}\n"
+            f"* Sức chứa ít nhất {suc_chua} người\n"
+            f"Danh sách phòng hiện khả dụng:\n{room_list}\n"
+            "Hãy đề xuất phòng tốt nhất kèm lý do ngắn gọn."
+        )
+
+        ai_response = self._call_gemini_api(prompt)
+        return {
+            'choices': rooms,
+            'ai_report': ai_response,
+        }
+
+    def open_gemini_suggestion_wizard(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Gợi ý Đặt phòng bằng Gemini',
+            'res_model': 'dat_phong.gemini.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_thoi_gian_muon_du_kien': self.thoi_gian_muon_du_kien,
+                'default_thoi_gian_tra_du_kien': self.thoi_gian_tra_du_kien,
+            },
+        }
+
     @api.constrains('phong_id', 'thoi_gian_muon_du_kien', 'thoi_gian_tra_du_kien')
     def _check_trung_gio_phong(self):
         for record in self:
@@ -211,7 +299,7 @@ class DatPhong(models.Model):
                 trung_lap = self.search([
                     ('phong_id', '=', record.phong_id.id),
                     ('id', '!=', record.id),
-                    ('trang_thai', '=', 'chờ_duyệt'),
+                    ('trang_thai', 'in', ['chờ_duyệt', 'đã_duyệt', 'đang_sử_dụng']),
                     ('thoi_gian_muon_du_kien', '<', record.thoi_gian_tra_du_kien),
                     ('thoi_gian_tra_du_kien', '>', record.thoi_gian_muon_du_kien)
                 ])

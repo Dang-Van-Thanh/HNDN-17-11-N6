@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'views/quan_ly_phong_hop.xml',
         'views/dat_phong.xml',
+        'views/dat_phong_gemini.xml',
         'views/lich_su_thay_doi.xml',
         'views/lich_su_muon_tra.xml',
         'views/dat_phong_dashboard.xml',
