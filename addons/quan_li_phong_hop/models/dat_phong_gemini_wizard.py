@@ -6,7 +6,11 @@ class DatPhongGeminiWizard(models.TransientModel):
     _name = 'dat_phong.gemini.wizard'
     _description = 'Gợi ý đặt phòng họp bằng AI Gemini'
 
-    yeu_cau_text = fields.Text(string='Yêu cầu đặt phòng (ví dụ: Tôi cần phòng họp cho 10 người vào ngày 21/4 và có thời gian 30 phút)', required=True)
+    yeu_cau_text = fields.Text(
+        string='Yêu cầu đặt phòng',
+        required=True,
+        default='Tôi cần phòng họp cho 10 người vào ngày 22/03/2026 bắt đầu 9:00, thời lượng 30 phút'
+    )
     nguoi_muon_id = fields.Many2one('nhan_vien', string='Người mượn', required=True)
     goi_y_ai = fields.Text(string='Gợi ý AI Gemini', readonly=True)
     phong_id = fields.Many2one('quan_ly_phong_hop', string='Phòng đề xuất', readonly=True)
