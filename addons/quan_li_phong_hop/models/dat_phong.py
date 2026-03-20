@@ -310,7 +310,7 @@ class DatPhong(models.Model):
     def open_gemini_suggestion_wizard(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Gợi ý Đặt phòng bằng Gemini',
+            'name': 'Gợi ý AI Gemini',
             'res_model': 'dat_phong.gemini.wizard',
             'view_mode': 'form',
             'target': 'new',

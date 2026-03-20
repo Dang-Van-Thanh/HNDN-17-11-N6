@@ -4,10 +4,10 @@
             <field name="name">dat_phong_gemini_wizard_form</field>
             <field name="model">dat_phong.gemini.wizard</field>
             <field name="arch" type="xml">
-                <form string="Gợi ý &amp; Đặt phòng AI Gemini">
+                <form string="Gợi ý AI Gemini">
                     <sheet>
                         <div class="alert alert-info" role="alert">
-                            <strong>💡 Hướng dẫn:</strong> Điền thông tin thời gian và sức chứa để xem danh sách phòng phù hợp. Nhấn "🤖 Lấy gợi ý AI" để AI Gemini phân tích và đề xuất phòng tốt nhất.
+                            <strong>💡 Hướng dẫn:</strong> Điền thông tin thời gian và sức chứa. Nhấn "🤖 Lấy gợi ý AI" để AI Gemini phân tích và đề xuất phòng phù hợp.
                         </div>
 
                         <group col="2">
@@ -21,39 +21,13 @@
                             </group>
                         </group>
 
-                        <group col="2">
-                            <group string="🎯 Phòng đề xuất">
-                                <field name="phong_id" options="{'no_create': True, 'no_edit': True}"/>
-                                <div class="oe_stat_info">
-                                    <strong>Phòng phù hợp:</strong> <field name="phong_phu_hop_ids" widget="statinfo" string=""/>
-                                </div>
-                            </group>
-                            <group string="🤖 Gợi ý AI">
-                                <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
-                            </group>
+                        <group string="🤖 Gợi ý AI">
+                            <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
                         </group>
-
-                        <notebook>
-                            <page string="🏢 Danh sách phòng phù hợp" name="phong_phu_hop">
-                                <field name="phong_phu_hop_ids" readonly="1">
-                                    <tree decoration-success="suc_chua >= parent.suc_chua">
-                                        <field name="name" string="Tên phòng"/>
-                                        <field name="suc_chua" string="Sức chứa"/>
-                                        <field name="loai_phong" string="Loại phòng"/>
-                                        <field name="trang_thai" string="Trạng thái"/>
-                                    </tree>
-                                </field>
-                                <div class="alert alert-light mt-2" role="alert">
-                                    <small>💡 Phòng được đánh dấu xanh là đủ sức chứa theo yêu cầu của bạn.</small>
-                                </div>
-                            </page>
-                        </notebook>
                     </sheet>
                     <footer>
                         <button string="🤖 Lấy gợi ý AI" type="object" name="action_get_ai_suggestion" class="btn-info"
                                 attrs="{'invisible': [('thoi_gian_muon_du_kien', '=', False), ('thoi_gian_tra_du_kien', '=', False), ('suc_chua', '=', 0)]}"/>
-                        <button string="✅ Đặt phòng" type="object" name="action_confirm_booking" class="btn-success"
-                                attrs="{'invisible': [('phong_id', '=', False)]}"/>
                         <button string="❌ Hủy" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
@@ -61,7 +35,7 @@
         </record>
 
         <record id="action_dat_phong_gemini_wizard" model="ir.actions.act_window">
-            <field name="name">Gợi ý &amp; Đặt phòng AI Gemini</field>
+            <field name="name">Gợi ý AI Gemini</field>
             <field name="res_model">dat_phong.gemini.wizard</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_dat_phong_gemini_wizard_form"/>
@@ -69,7 +43,7 @@
         </record>
 
         <menuitem id="menu_dat_phong_ai_gemini" 
-                  name="Đặt phòng AI Gemini" 
+                  name="Gợi ý AI Gemini" 
                   parent="menu_dat_phong" 
                   action="action_dat_phong_gemini_wizard" 
                   sequence="1"/>
