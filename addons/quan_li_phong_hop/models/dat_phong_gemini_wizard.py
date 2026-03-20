@@ -1,4 +1,5 @@
 from odoo import models, fields, api, exceptions
+from datetime import datetime, timedelta
 import re
 
 class DatPhongGeminiWizard(models.TransientModel):
@@ -9,6 +10,45 @@ class DatPhongGeminiWizard(models.TransientModel):
     nguoi_muon_id = fields.Many2one('nhan_vien', string='Người mượn', required=True)
     goi_y_ai = fields.Text(string='Gợi ý AI Gemini', readonly=True)
     phong_id = fields.Many2one('quan_ly_phong_hop', string='Phòng đề xuất', readonly=True)
+
+    def _parse_text_request(self, text):
+        """Parse yêu cầu tự nhiên sang số người, ngày, giờ bắt đầu, và thời lượng (phút)"""
+        result = {
+            'suc_chua': None,
+            'date': None,
+            'start_time': None,
+            'duration': None,
+        }
+
+        # Số người
+        match_people = re.search(r'(\d+)\s*người', text, re.IGNORECASE)
+        if match_people:
+            result['suc_chua'] = int(match_people.group(1))
+
+        # Duration
+        match_duration = re.search(r'thời gian\s*(\d+)\s*phút', text, re.IGNORECASE)
+        if match_duration:
+            result['duration'] = int(match_duration.group(1))
+
+        # Date dạng dd/mm hoặc dd/mm/yyyy
+        match_date = re.search(r'((\d{1,2})/(\d{1,2})(?:/(\d{4}))?)', text)
+        if match_date:
+            d = int(match_date.group(2))
+            m = int(match_date.group(3))
+            y = int(match_date.group(4)) if match_date.group(4) else datetime.now().year
+            try:
+                result['date'] = datetime(year=y, month=m, day=d)
+            except Exception:
+                result['date'] = None
+
+        # Thời gian bắt đầu dạng 9 giờ hoặc 9h
+        match_start = re.search(r'bắt đầu\s*(\d{1,2})(?:[:hH](\d{1,2}))?\s*giờ', text, re.IGNORECASE)
+        if match_start:
+            hour = int(match_start.group(1))
+            minute = int(match_start.group(2)) if match_start.group(2) else 0
+            result['start_time'] = (hour, minute)
+
+        return result
 
     def action_get_ai_suggestion(self):
         """Gọi AI Gemini để phân tích yêu cầu và gợi ý phòng"""
@@ -22,42 +62,44 @@ class DatPhongGeminiWizard(models.TransientModel):
                 'target': 'new',
             }
 
-        # Prompt để AI phân tích và gợi ý
+        parse = self._parse_text_request(self.yeu_cau_text)
+        if not (parse['suc_chua'] and parse['date'] and parse['start_time'] and parse['duration']):
+            self.write({'goi_y_ai': 'Không thể phân tích đầy đủ từ yêu cầu. Vui lòng ghi rõ: số người, ngày, giờ bắt đầu, thời lượng (phút).'})
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': self._name,
+                'view_mode': 'form',
+                'res_id': self.id,
+                'target': 'new',
+            }
+
+        start = datetime(year=parse['date'].year, month=parse['date'].month, day=parse['date'].day,
+                         hour=parse['start_time'][0], minute=parse['start_time'][1])
+        end = start + timedelta(minutes=parse['duration'])
+
+        rooms = self.env['dat_phong'].sudo()._get_available_rooms(start, end, parse['suc_chua'])
+        if not rooms:
+            self.write({'goi_y_ai': 'Không có phòng trống phù hợp theo yêu cầu.'})
+            return {'type': 'ir.actions.act_window', 'res_model': self._name, 'view_mode': 'form', 'res_id': self.id, 'target': 'new'}
+
+        candidate_name = rooms.sorted(key=lambda r: r.suc_chua)[0].name
+        candidate_id = rooms.sorted(key=lambda r: r.suc_chua)[0].id
+
         prompt = f"""
-        Phân tích yêu cầu đặt phòng sau: "{self.yeu_cau_text}"
-        
-        Hãy:
-        1. Trích xuất thông tin: số người, ngày, thời gian bắt đầu, thời lượng.
-        2. Gợi ý phòng họp phù hợp từ danh sách có sẵn.
-        3. Trả về định dạng:
-        Phòng đề xuất: [Tên phòng]
-        Lý do: [Lý do ngắn gọn]
+        Yêu cầu: {self.yeu_cau_text}
+        Có {len(rooms)} phòng trống phù hợp với sức chứa tối thiểu {parse['suc_chua']}.
+        Danh sách phòng: {', '.join([f'{r.name}({r.suc_chua})' for r in rooms])}.
+
+        Hãy đề xuất 1 phòng tốt nhất và lý do ngắn gọn, và viết lại thông tin đặt phòng.
         """
 
         try:
             ai_response = self.env['dat_phong'].sudo()._call_gemini_api(prompt)
-            goi_y_text = ai_response
-            phong_id = False
-
-            # Parse để tìm phòng đề xuất
-            match = re.search(r'Phòng đề xuất:\s*([^\n]+)', ai_response, re.IGNORECASE)
-            if match:
-                room_name = match.group(1).strip()
-                room = self.env['quan_ly_phong_hop'].sudo().search([('name', 'ilike', room_name)], limit=1)
-                if room:
-                    phong_id = room.id
-                else:
-                    goi_y_text += '\n\nKhông tìm thấy phòng phù hợp trong hệ thống.'
-            else:
-                goi_y_text += '\n\nAI không đề xuất phòng cụ thể.'
-
-            self.write({'goi_y_ai': goi_y_text, 'phong_id': phong_id})
-
+            result_text = f"AI Gemini gợi ý:\n{ai_response}\n\nPhòng được chọn (dựa trên dữ liệu hệ thống): {candidate_name}"
+            self.write({'goi_y_ai': result_text, 'phong_id': candidate_id})
         except BaseException as e:
-            error_msg = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
-            self.write({'goi_y_ai': error_msg})
+            self.write({'goi_y_ai': f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'})
 
-        # Reload wizard để hiển thị kết quả
         return {
             'type': 'ir.actions.act_window',
             'res_model': self._name,
