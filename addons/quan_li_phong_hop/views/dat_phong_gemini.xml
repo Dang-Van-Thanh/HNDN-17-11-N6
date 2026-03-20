@@ -24,7 +24,9 @@
                         <group col="2">
                             <group string="🎯 Phòng đề xuất">
                                 <field name="phong_id" options="{'no_create': True, 'no_edit': True}"/>
-                                <field name="so_phong_phu_hop" readonly="1" class="oe_stat_info"/>
+                                <div class="oe_stat_info">
+                                    <strong>Phòng phù hợp:</strong> <field name="phong_phu_hop_ids" widget="statinfo" string=""/>
+                                </div>
                             </group>
                             <group string="🤖 Gợi ý AI">
                                 <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
