@@ -117,21 +117,41 @@ class DatPhongGeminiWizard(models.TransientModel):
         }
 
     def action_dat_phong_theo_goi_y(self):
-        """Đặt phòng theo gợi ý AI"""
+        """Đặt phòng theo gợi ý AI - tạo booking tự động"""
         if not self.phong_id:
             raise exceptions.UserError('AI chưa gợi ý phòng nào. Vui lòng nhấn "Lấy gợi ý AI" trước.')
         
-        # Parse thời gian từ yêu cầu (đơn giản, giả sử có ngày và thời gian)
-        # Đây là placeholder, có thể cải thiện bằng AI parse thêm
-        # Giả sử user nhập có ngày, parse để set thời gian
-        # Nhưng để đơn giản, raise error yêu cầu nhập thời gian cụ thể
-        raise exceptions.UserError('Chức năng đặt phòng tự động chưa hoàn thiện. Vui lòng sử dụng form đặt phòng thông thường với thông tin từ gợi ý AI.')
-
-        # Nếu parse được, tạo booking
-        # new_booking = self.env['dat_phong'].create({...})
-        # return action to view booking
-
-        # Reload wizard để hiển thị kết quả
+        # Parse thời gian từ yêu cầu
+        parse = self._parse_text_request(self.yeu_cau_text)
+        if not (parse['date'] and parse['start_time'] and parse['duration']):
+            raise exceptions.UserError('Không thể trích xuất thời gian từ yêu cầu. Vui lòng kiểm tra lại định dạng.')
+        
+        # Tính thời gian bắt đầu và kết thúc
+        start = datetime(year=parse['date'].year, month=parse['date'].month, day=parse['date'].day,
+                         hour=parse['start_time'][0], minute=parse['start_time'][1])
+        end = start + timedelta(minutes=parse['duration'])
+        
+        # Tạo booking
+        try:
+            new_booking = self.env['dat_phong'].sudo().create({
+                'phong_id': self.phong_id.id,
+                'nguoi_muon_id': self.nguoi_muon_id.id,
+                'thoi_gian_muon_du_kien': start,
+                'thoi_gian_tra_du_kien': end,
+                'trang_thai': 'chờ_duyệt',
+            })
+            
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'dat_phong',
+                'view_mode': 'form',
+                'res_id': new_booking.id,
+                'target': 'current',
+            }
+        except exceptions.ValidationError as e:
+            raise exceptions.UserError(f'Lỗi tạo booking: {str(e)}')
+        except Exception as e:
+            raise exceptions.UserError(f'Lỗi hệ thống khi đặt phòng: {str(e)}')
         return {
             'type': 'ir.actions.act_window',
             'res_model': self._name,
