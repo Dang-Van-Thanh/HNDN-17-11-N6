@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <form string="📋 Chi tiết Đăng Ký Mượn Phòng">
                     <header>
-                        <button name="open_gemini_suggestion_wizard" type="object" string="🤖 Gợi ý & Đặt phòng (Gemini)" class="btn-primary"/>
+                        <button name="open_gemini_suggestion_wizard" type="object" string="🤖 Gợi ý &amp; Đặt phòng (Gemini)" class="btn-primary"/>
                     </header>
                     <sheet>
                        
