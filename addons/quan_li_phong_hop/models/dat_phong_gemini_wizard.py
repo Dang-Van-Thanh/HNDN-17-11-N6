@@ -26,7 +26,7 @@ class DatPhongGeminiWizard(models.TransientModel):
             result['suc_chua'] = int(match_people.group(1))
 
         # Duration
-        match_duration = re.search(r'thời gian\s*(\d+)\s*phút', text, re.IGNORECASE)
+        match_duration = re.search(r'(?:thời gian|thời lượng)\s*(\d+)\s*phút', text, re.IGNORECASE)
         if match_duration:
             result['duration'] = int(match_duration.group(1))
 
@@ -41,11 +41,15 @@ class DatPhongGeminiWizard(models.TransientModel):
             except Exception:
                 result['date'] = None
 
-        # Thời gian bắt đầu dạng 9 giờ hoặc 9h
-        match_start = re.search(r'bắt đầu\s*(\d{1,2})(?:[:hH](\d{1,2}))?\s*giờ', text, re.IGNORECASE)
+        # Thời gian bắt đầu dạng 9:00, 9h, 9 giờ
+        match_start = re.search(r'bắt đầu\s*(\d{1,2})(?::(\d{1,2})|h(?:\s*(\d{1,2}))?)?\s*(?:giờ)?', text, re.IGNORECASE)
         if match_start:
             hour = int(match_start.group(1))
-            minute = int(match_start.group(2)) if match_start.group(2) else 0
+            minute = 0
+            if match_start.group(2):
+                minute = int(match_start.group(2))
+            elif match_start.group(3):
+                minute = int(match_start.group(3))
             result['start_time'] = (hour, minute)
 
         return result
