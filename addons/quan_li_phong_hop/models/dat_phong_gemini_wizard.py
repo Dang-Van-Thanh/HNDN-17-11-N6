@@ -142,7 +142,31 @@ class DatPhongGeminiWizard(models.TransientModel):
             })
             
             # Auto-approve booking ngay lập tức
-            new_booking.sudo().xac_nhan_duyet_phong()
+            try:
+                # Đơn giản hóa: chỉ duyệt booking mà không hủy các booking khác
+                # vì phòng đã được kiểm tra là trống trong _get_available_rooms
+                new_booking.sudo().write({"trang_thai": "đã_duyệt"})
+                # Tạo lịch sử thay đổi
+                self.env["lich_su_thay_doi"].sudo().create({
+                    "dat_phong_id": new_booking.id,
+                    "nguoi_muon_id": new_booking.nguoi_muon_id.id,
+                    "thoi_gian_muon_du_kien": new_booking.thoi_gian_muon_du_kien,
+                    "thoi_gian_muon_thuc_te": new_booking.thoi_gian_muon_thuc_te,
+                    "thoi_gian_tra_du_kien": new_booking.thoi_gian_tra_du_kien,
+                    "thoi_gian_tra_thuc_te": new_booking.thoi_gian_tra_thuc_te,
+                    "trang_thai": "đã_duyệt"
+                })
+            except Exception as e:
+                # Nếu auto-approve thất bại, vẫn cho phép tạo booking nhưng log lỗi
+                self.env['ir.logging'].sudo().create({
+                    'name': 'Auto-approve thất bại',
+                    'type': 'server',
+                    'level': 'WARNING',
+                    'message': f'Auto-approve thất bại cho booking {new_booking.id}: {str(e)}',
+                    'path': 'dat_phong.gemini.wizard',
+                    'func': 'action_dat_phong_theo_goi_y',
+                    'line': '140'
+                })
             
             return {
                 'type': 'ir.actions.act_window',
