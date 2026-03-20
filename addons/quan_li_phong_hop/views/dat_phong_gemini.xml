@@ -4,7 +4,7 @@
             <field name="name">dat_phong_gemini_wizard_form</field>
             <field name="model">dat_phong.gemini.wizard</field>
             <field name="arch" type="xml">
-                <form string="Gợi ý & Đặt phòng AI Gemini">
+                <form string="Gợi ý &amp; Đặt phòng AI Gemini">
                     <sheet>
                         <group>
                             <field name="nguoi_muon_id"/>
@@ -27,7 +27,7 @@
         </record>
 
         <record id="action_dat_phong_gemini_wizard" model="ir.actions.act_window">
-            <field name="name">Gợi ý & Đặt phòng AI Gemini</field>
+            <field name="name">Gợi ý &amp; Đặt phòng AI Gemini</field>
             <field name="res_model">dat_phong.gemini.wizard</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_dat_phong_gemini_wizard_form"/>
