@@ -13,7 +13,7 @@ class DatPhongGeminiWizard(models.TransientModel):
     def action_get_ai_suggestion(self):
         """Gọi AI Gemini để phân tích yêu cầu và gợi ý phòng"""
         if not self.yeu_cau_text:
-            self.goi_y_ai = 'Vui lòng nhập yêu cầu đặt phòng.'
+            self.write({'goi_y_ai': 'Vui lòng nhập yêu cầu đặt phòng.'})
             return {
                 'type': 'ir.actions.act_window',
                 'res_model': self._name,
@@ -36,7 +36,8 @@ class DatPhongGeminiWizard(models.TransientModel):
 
         try:
             ai_response = self.env['dat_phong'].sudo()._call_gemini_api(prompt)
-            self.goi_y_ai = ai_response
+            goi_y_text = ai_response
+            phong_id = False
 
             # Parse để tìm phòng đề xuất
             match = re.search(r'Phòng đề xuất:\s*([^\n]+)', ai_response, re.IGNORECASE)
@@ -44,14 +45,17 @@ class DatPhongGeminiWizard(models.TransientModel):
                 room_name = match.group(1).strip()
                 room = self.env['quan_ly_phong_hop'].sudo().search([('name', 'ilike', room_name)], limit=1)
                 if room:
-                    self.phong_id = room.id
+                    phong_id = room.id
                 else:
-                    self.goi_y_ai += '\n\nKhông tìm thấy phòng phù hợp trong hệ thống.'
+                    goi_y_text += '\n\nKhông tìm thấy phòng phù hợp trong hệ thống.'
             else:
-                self.goi_y_ai += '\n\nAI không đề xuất phòng cụ thể.'
+                goi_y_text += '\n\nAI không đề xuất phòng cụ thể.'
+
+            self.write({'goi_y_ai': goi_y_text, 'phong_id': phong_id})
 
         except BaseException as e:
-            self.goi_y_ai = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
+            error_msg = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
+            self.write({'goi_y_ai': error_msg})
 
         # Reload wizard để hiển thị kết quả
         return {
