@@ -15,7 +15,7 @@
                                 <field name="nguoi_muon_id"/>
                             </group>
                             <group string="📝 Yêu cầu">
-                                <field name="yeu_cau_text" placeholder="Ví dụ: Tôi cần phòng họp cho 10 người vào ngày 21/4 và có thời gian 30 phút"/>
+                                <field name="yeu_cau_text" placeholder="Ví dụ: Tôi cần phòng họp cho 10 người vào ngày 21/4 và có thời gian 30 phút bắt đầu từ 9 giờ sáng"/>
                             </group>
                             <group string="🤖 Gợi ý AI">
                                 <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
