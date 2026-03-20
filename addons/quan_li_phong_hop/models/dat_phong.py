@@ -232,8 +232,12 @@ class DatPhong(models.Model):
         if not api_key:
             return 'Chưa cấu hình API Gemini. Sử dụng gợi ý nội bộ.'
 
-        # Sử dụng endpoint chính xác cho Gemini 1.5 Flash
-        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
+        # Validate API key format
+        if not api_key.startswith('AIzaSy') or len(api_key) < 35:
+            return 'API key không hợp lệ. API key phải bắt đầu bằng "AIzaSy" và có độ dài ít nhất 35 ký tự.'
+
+        # Sử dụng endpoint chính xác cho Gemini 1.5 Pro
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={api_key}'
         headers = {
             'Content-Type': 'application/json',
         }
@@ -250,7 +254,7 @@ class DatPhong(models.Model):
         }
 
         try:
-            result = requests.post(url, json=payload, headers=headers, timeout=20)
+            result = requests.post(url, json=payload, headers=headers, timeout=30)
             result.raise_for_status()
             data = result.json()
 
@@ -261,6 +265,19 @@ class DatPhong(models.Model):
                     return candidate['content']['parts'][0].get('text', '').strip()
 
             return 'Gemini trả về kết quả rỗng.'
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                return f'Không tìm thấy endpoint API. Vui lòng kiểm tra API key và quyền truy cập.'
+            elif e.response.status_code == 403:
+                return f'API key không có quyền truy cập. Vui lòng kiểm tra API key.'
+            elif e.response.status_code == 429:
+                return f'Quá nhiều yêu cầu. Vui lòng thử lại sau.'
+            else:
+                return f'Lỗi HTTP {e.response.status_code}: {e.response.text}'
+        except requests.exceptions.Timeout:
+            return 'Timeout khi kết nối đến Gemini API.'
+        except requests.exceptions.ConnectionError:
+            return 'Không thể kết nối đến Gemini API. Kiểm tra kết nối internet.'
         except Exception as e:
             return f'Không thể kết nối Gemini: {str(e)}'
 
