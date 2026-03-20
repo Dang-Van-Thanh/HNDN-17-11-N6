@@ -7,27 +7,27 @@
                 <form string="Gợi ý AI Gemini">
                     <sheet>
                         <div class="alert alert-info" role="alert">
-                            <strong>💡 Hướng dẫn:</strong> Điền thông tin thời gian và sức chứa. Nhấn "🤖 Lấy gợi ý AI" để AI Gemini phân tích và đề xuất phòng phù hợp.
+                            <strong>💡 Hướng dẫn:</strong> Nhập yêu cầu đặt phòng bằng ngôn ngữ tự nhiên. AI Gemini sẽ phân tích và gợi ý phòng phù hợp.
                         </div>
 
-                        <group col="2">
-                            <group string="👤 Thông tin đặt phòng">
+                        <group col="1">
+                            <group string="👤 Thông tin">
                                 <field name="nguoi_muon_id"/>
-                                <field name="suc_chua"/>
                             </group>
-                            <group string="📅 Thời gian">
-                                <field name="thoi_gian_muon_du_kien"/>
-                                <field name="thoi_gian_tra_du_kien"/>
+                            <group string="📝 Yêu cầu">
+                                <field name="yeu_cau_text" placeholder="Ví dụ: Tôi cần phòng họp cho 10 người vào ngày 21/4 và có thời gian 30 phút"/>
                             </group>
-                        </group>
-
-                        <group string="🤖 Gợi ý AI">
-                            <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
+                            <group string="🤖 Gợi ý AI">
+                                <field name="goi_y_ai" readonly="1" placeholder="AI Gemini sẽ đưa ra gợi ý ở đây..."/>
+                                <field name="phong_id" readonly="1" options="{'no_create': True, 'no_edit': True}"/>
+                            </group>
                         </group>
                     </sheet>
                     <footer>
                         <button string="🤖 Lấy gợi ý AI" type="object" name="action_get_ai_suggestion" class="btn-info"
-                                attrs="{'invisible': [('thoi_gian_muon_du_kien', '=', False), ('thoi_gian_tra_du_kien', '=', False), ('suc_chua', '=', 0)]}"/>
+                                attrs="{'invisible': [('yeu_cau_text', '=', False)]}"/>
+                        <button string="✅ Đặt phòng theo gợi ý" type="object" name="action_dat_phong_theo_goi_y" class="btn-success"
+                                attrs="{'invisible': [('phong_id', '=', False)]}"/>
                         <button string="❌ Hủy" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
