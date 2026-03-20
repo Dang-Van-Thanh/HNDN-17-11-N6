@@ -12,3 +12,4 @@ from . import phieu_bao_tri
 from . import lich_su_dieu_chuyen
 from . import phieu_dieu_chuyen
 from . import thanh_ly
+from . import nhan_vien_tai_san
