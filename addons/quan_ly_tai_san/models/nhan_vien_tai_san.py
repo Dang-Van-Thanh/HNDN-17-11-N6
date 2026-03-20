@@ -78,11 +78,52 @@ class NhanVien(models.Model):
                     # bỏ qua chuyển thành done nếu mới draft
                     phieu.state = 'done'
 
+            # Thu hồi đặt phòng họp thuộc trạng thái chờ/đã duyệt/đang sử dụng khi nhân viên nghỉ việc
+            booking_records = self.env['dat_phong'].search([
+                ('nguoi_muon_id', '=', record.id),
+                ('trang_thai', 'in', ['chờ_duyệt', 'đã_duyệt', 'đang_sử_dụng']),
+            ])
+            for booking in booking_records:
+                if booking.trang_thai == 'đang_sử_dụng':
+                    try:
+                        booking.tra_phong()
+                    except Exception:
+                        booking.write({'trang_thai': 'đã_hủy'})
+                else:
+                    booking.write({'trang_thai': 'đã_hủy'})
+
+    def _book_meeting_room(self):
+        for record in self:
+            if record.trang_thai != 'DangLam':
+                continue
+
+            # Tìm phòng họp Trống, ưu tiên phòng trống; nếu không có ghi trên 1 phòng bất kỳ
+            room = self.env['quan_ly_phong_hop'].search([('trang_thai', '=', 'Trống')], limit=1)
+            if not room:
+                room = self.env['quan_ly_phong_hop'].search([], limit=1)
+            if not room:
+                raise UserError('Không tìm thấy phòng họp để đặt. Vui lòng thêm phòng họp.')
+
+            now = fields.Datetime.now()
+            start = fields.Datetime.to_datetime(now) + timedelta(days=1)
+            end = start + timedelta(minutes=30)
+
+            booking = self.env['dat_phong'].create({
+                'phong_id': room.id,
+                'nguoi_muon_id': record.id,
+                'thoi_gian_muon_du_kien': start.strftime('%Y-%m-%d %H:%M:%S'),
+                'thoi_gian_tra_du_kien': end.strftime('%Y-%m-%d %H:%M:%S'),
+            })
+
+            # Tự động duyệt, chờ bắt đầu
+            booking.xac_nhan_duyet_phong()
+
     @api.model
     def create(self, vals):
         record = super(NhanVien, self).create(vals)
         if record.trang_thai == 'DangLam':
             record._allocate_laptop_and_create_phieu_muon()
+            record._book_meeting_room()
         return record
 
     def write(self, vals):
@@ -96,6 +137,7 @@ class NhanVien(models.Model):
             if previous != current:
                 if current == 'DangLam':
                     record._allocate_laptop_and_create_phieu_muon()
+                    record._book_meeting_room()
                 elif current == 'NghiViec':
                     record._reclaim_assets_and_close_phi_muon()
 
