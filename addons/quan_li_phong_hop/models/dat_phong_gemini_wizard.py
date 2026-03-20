@@ -11,12 +11,6 @@ class DatPhongGeminiWizard(models.TransientModel):
     phong_id = fields.Many2one('quan_ly_phong_hop', string='Phòng đề xuất')
     goi_y_ai = fields.Text(string='Gợi ý AI Gemini')
     phong_phu_hop_ids = fields.Many2many('quan_ly_phong_hop', string='Phòng phù hợp', readonly=True)
-    so_phong_phu_hop = fields.Integer(string='Số phòng phù hợp', compute='_compute_so_phong_phu_hop', store=True)
-
-    @api.depends('phong_phu_hop_ids')
-    def _compute_so_phong_phu_hop(self):
-        for record in self:
-            record.so_phong_phu_hop = len(record.phong_phu_hop_ids)
 
     @api.onchange('thoi_gian_muon_du_kien', 'thoi_gian_tra_du_kien', 'suc_chua')
     def onchange_suggest(self):
