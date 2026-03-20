@@ -232,24 +232,35 @@ class DatPhong(models.Model):
         if not api_key:
             return 'Chưa cấu hình API Gemini. Sử dụng gợi ý nội bộ.'
 
-        url = 'https://gemini.googleapis.com/v1/models/gemini-1.5-mini:generateText'
+        # Sử dụng endpoint chính xác cho Gemini 1.5 Flash
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
         headers = {
-            'Authorization': f'Bearer {api_key}',
             'Content-Type': 'application/json',
         }
         payload = {
-            'prompt': prompt,
-            'temperature': 0.2,
-            'maxOutputTokens': 400,
+            'contents': [{
+                'parts': [{
+                    'text': prompt
+                }]
+            }],
+            'generationConfig': {
+                'temperature': 0.2,
+                'maxOutputTokens': 400,
+            }
         }
 
         try:
             result = requests.post(url, json=payload, headers=headers, timeout=20)
             result.raise_for_status()
             data = result.json()
-            if data.get('candidates'):
-                return data['candidates'][0].get('content', '').strip()
-            return data.get('output', {}).get('text', '').strip() or 'Gemini trả về kết quả rỗng.'
+
+            # Parse response từ Gemini API
+            if 'candidates' in data and data['candidates']:
+                candidate = data['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    return candidate['content']['parts'][0].get('text', '').strip()
+
+            return 'Gemini trả về kết quả rỗng.'
         except Exception as e:
             return f'Không thể kết nối Gemini: {str(e)}'
 
