@@ -141,6 +141,9 @@ class DatPhongGeminiWizard(models.TransientModel):
                 'trang_thai': 'chờ_duyệt',
             })
             
+            # Auto-approve booking ngay lập tức
+            new_booking.sudo().xac_nhan_duyet_phong()
+            
             return {
                 'type': 'ir.actions.act_window',
                 'res_model': 'dat_phong',
