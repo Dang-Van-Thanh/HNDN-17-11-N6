@@ -24,5 +24,14 @@ class DatPhongGeminiWizard(models.TransientModel):
             )
 
             self.goi_y_ai = data.get('ai_report', 'Không thể lấy gợi ý từ AI. Vui lòng thử lại.')
-        except Exception as e:
+        except BaseException as e:
             self.goi_y_ai = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
+
+        # Reload wizard để hiển thị kết quả
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+        }
