@@ -16,10 +16,13 @@ class DatPhongGeminiWizard(models.TransientModel):
             self.goi_y_ai = 'Vui lòng điền đầy đủ thông tin trước khi yêu cầu gợi ý AI.'
             return
 
-        data = self.env['dat_phong'].suggest_room_for_time_capacity(
-            self.thoi_gian_muon_du_kien,
-            self.thoi_gian_tra_du_kien,
-            self.suc_chua,
-        )
+        try:
+            data = self.env['dat_phong'].suggest_room_for_time_capacity(
+                self.thoi_gian_muon_du_kien,
+                self.thoi_gian_tra_du_kien,
+                self.suc_chua,
+            )
 
-        self.goi_y_ai = data.get('ai_report', 'Không thể lấy gợi ý từ AI. Vui lòng thử lại.')
+            self.goi_y_ai = data.get('ai_report', 'Không thể lấy gợi ý từ AI. Vui lòng thử lại.')
+        except Exception as e:
+            self.goi_y_ai = f'Lỗi khi lấy gợi ý AI: {str(e)}. Vui lòng thử lại sau.'
