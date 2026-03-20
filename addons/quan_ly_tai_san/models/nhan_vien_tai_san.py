@@ -97,12 +97,15 @@ class NhanVien(models.Model):
             if record.trang_thai != 'DangLam':
                 continue
 
-            # Tìm phòng họp Trống, ưu tiên phòng trống; nếu không có ghi trên 1 phòng bất kỳ
-            room = self.env['quan_ly_phong_hop'].search([('trang_thai', '=', 'Trống')], limit=1)
+            # Chọn phòng họp Trống có sức chứa tối thiểu >=2 và nhỏ nhất
+            rooms = self.env['quan_ly_phong_hop'].search([
+                ('trang_thai', '=', 'Trống'),
+                ('suc_chua', '>=', 2),
+            ], order='suc_chua asc')
+            room = rooms[:1] if rooms else False
+
             if not room:
-                room = self.env['quan_ly_phong_hop'].search([], limit=1)
-            if not room:
-                raise UserError('Không tìm thấy phòng họp để đặt. Vui lòng thêm phòng họp.')
+                raise UserError('Không tìm thấy phòng họp Trống với sức chứa >=2. Vui lòng thêm hoặc thanh toán phòng phù hợp.')
 
             now = fields.Datetime.now()
             start = fields.Datetime.to_datetime(now) + timedelta(days=1)
